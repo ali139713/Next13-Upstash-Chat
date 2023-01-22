@@ -1,17 +1,64 @@
-'use client'
+"use client";
 
 import { FormEvent, useState } from "react";
-
+import { v4 as uuid } from "uuid";
+import { Message } from "../typings";
+import useSWR from 'swr';
+import fetcher from "../utils/fetchMessages";
 
 const ChatInput = () => {
-    const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>("");
 
-    const addMessage = (e:FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    }
+  const { data:messages, error, mutate } = useSWR<Message[]>('/api/messages', fetcher)
+
+
+  const addMessage = async(e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!input) return;
+
+    const messageToSend = input;
+
+    setInput("");
+
+    const id = uuid();
+
+    const message: Message = {
+      id,
+      message: messageToSend,
+      created_at: Date.now(),
+      username: "Ali",
+      profilePic:
+        "https://www.upwork.com/profile-portraits/c1-2dvv0KmpTh4CYF4A606NW_crrCq1eg6nRIYjkfJpKGhJ5tdls9ZWiS9Ioi7W2d0",
+      email: "aliazhar1306@gmail.com",
+    };
+    await mutate(uploadMessageToUpstash(message),{
+      optimisticData:[message, ...messages!],
+      rollbackOnError:true
+    })
+  };
+
+
+  const uploadMessageToUpstash = async (message: Message) => {
+    const res = await fetch("/api/addMessage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({message}),
+    });
+
+    const data = await res.json();
+
+    return [data.message, ...messages!];
+
+  };
 
   return (
-    <form onSubmit={addMessage} className="flex fixed bottom-0 z-50 w-full px-10 py-5 space-x-2 border-t border-gray-100">
+    <form
+      onSubmit={addMessage}
+      className="flex fixed bottom-0 z-50 w-full px-10 py-5 space-x-2 border-t border-gray-100"
+    >
       <input
         type="text"
         placeholder="Enter message ...."
