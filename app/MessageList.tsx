@@ -7,7 +7,11 @@ import MessageComponent from "./MessageComponent";
 import { useEffect } from "react";
 import { clientPusher } from "../pusher";
 
-const MessageList = () => {
+type Props = {
+  initialMessages:Message[]
+}
+
+const MessageList = ({initialMessages}:Props) => {
   const { data: messages, error, mutate } = useSWR<Message[]>("/api/messages", fetcher);
 
   useEffect(() => {
@@ -29,6 +33,12 @@ const MessageList = () => {
         }
 
       })
+
+      return () => {
+        channel.unbind_all();
+        channel.unsubscribe()
+      }
+
   },[])
 
   return (
