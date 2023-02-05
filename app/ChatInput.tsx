@@ -57,7 +57,7 @@ const ChatInput = () => {
   return (
     <form
       onSubmit={addMessage}
-      className="flex fixed bottom-0 z-50 w-full px-10 py-5 space-x-2 border-t border-gray-100"
+      className="flex fixed bottom-0 z-50 w-full px-10 py-5 space-x-2 bg-white border-t border-gray-100"
     >
       <input
         type="text"
