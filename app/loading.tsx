@@ -4,7 +4,7 @@ const loading = () => {
   return (
     <div className="text-center pt-8">
       <p className="text-blue-400 animate-pulse pb-5">
-        Loading your messages...
+        Loading Messenger...
       </p>
       <div role="status">
         <svg

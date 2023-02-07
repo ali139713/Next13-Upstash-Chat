@@ -5,8 +5,15 @@ import { v4 as uuid } from "uuid";
 import { Message } from "../typings";
 import useSWR from 'swr';
 import fetcher from "../utils/fetchMessages";
+import { getServerSession } from 'next-auth'  
 
-const ChatInput = () => {
+
+
+type Props = {
+  session:any
+}
+
+const ChatInput = ({session}:Props) => {
   const [input, setInput] = useState<string>("");
 
   const { data:messages, error, mutate } = useSWR<Message[]>('/api/messages', fetcher)
@@ -15,7 +22,7 @@ const ChatInput = () => {
   const addMessage = async(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!input) return;
+    if (!input || !session) return;
 
     const messageToSend = input;
 
@@ -27,9 +34,9 @@ const ChatInput = () => {
       id,
       message: messageToSend,
       created_at: Date.now(),
-      username: "Ali",
+      username: session?.user?.name!,
       profilePic:
-        "https://www.upwork.com/profile-portraits/c1-2dvv0KmpTh4CYF4A606NW_crrCq1eg6nRIYjkfJpKGhJ5tdls9ZWiS9Ioi7W2d0",
+      session?.user?.image! ,
       email: "aliazhar1306@gmail.com",
     };
     await mutate(uploadMessageToUpstash(message),{
@@ -62,6 +69,7 @@ const ChatInput = () => {
       <input
         type="text"
         placeholder="Enter message ...."
+        disabled={!session}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         className="flex-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent px-5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"

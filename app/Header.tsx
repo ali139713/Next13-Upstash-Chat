@@ -1,17 +1,18 @@
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import LogoutButton from "./LogoutButton";
 
-const Header = () => {
-  const session = false;
+const Header = async () => {
+  const session = await getServerSession()
 
   if (session) {
     return (
       <header className="sticky top-0 z-50 bg-white flex justify-between items-center py-8 px-10 shadow-sm">
         <div className="flex space-x-2">
           <Image
-            src="https://links.papareact.com/jne"
+            src={session?.user?.image!}
             className="rounded-full mx-2 object-contain"
             height={10}
             width={50}
@@ -19,7 +20,7 @@ const Header = () => {
           />
           <div>
             <p>Logged in as:</p>
-            <p>Ali Abdullah Azhar</p>
+            <p>{session?.user?.name}</p>
           </div>
         </div>
         <LogoutButton />
