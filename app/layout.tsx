@@ -15,6 +15,7 @@ export default async function RootLayout({
     <html>
       <head />
       <body>
+             {/* @ts-expect-error Server Component */}
         <Header />
         <Providers session={session}>{children}</Providers>
       </body>
